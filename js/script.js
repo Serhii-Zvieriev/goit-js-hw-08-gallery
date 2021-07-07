@@ -6,8 +6,16 @@ const lightboxImageRef = document.querySelector('.lightbox__image');
 const closeBtnRef = document.querySelector('.lightbox__button');
 const overlayRef = document.querySelector('div.lightbox__overlay');
 
+//ссылка на массив оригинальных изображений
+const arrayOriginalImg = galleryItems.map((elements) => elements.original);
+
 //вызов функции создания галереи
 addMarkupToGallery();
+
+//вызов кастомый слайдер
+customsSlider();
+
+// instalBgImgOnFullSkrin(customsSlider())
 
 //вешаю слушатель событий на галерею
 galleryRef.addEventListener('click', onImgClick);
@@ -47,7 +55,12 @@ function onImgClick(e) {
     if (e.target.nodeName !== 'IMG') {
         return;
     }
-    
+
+    //проверка на то чтобы в src мы не записывали ту же инфу что уже там
+    if (!arrayOriginalImg.includes(e.target.dataset.source)) {
+        return;
+    };
+   
     const urlBigImg = e.target.dataset.source;
     const altBigImg = e.target.alt;
 
@@ -77,38 +90,38 @@ function closeModal() {
 function instalBgImgOnFullSkrin(url, alt) {
     lightboxImageRef.src = url;
     lightboxImageRef.alt = alt;
-
-    // lightboxImageRef.addEventListener('clicl', (e)=>console.log(e.target));
 }
 
-//функция листать изображения стрелками
+//функция листать изображения стрелками - я не знаю как сделать чтобы стрелка в право листала по одно картинке а не до конца массива, если бы forEach поддерживал break я думаю это бы помогло, но он не поддреживате =(
 function customsSlider() {
-     
     window.addEventListener('keydown', (e) => {
-        if (e.key !== "ArrowLeft") {
-            return;
-        }
-        console.log(lightboxImageRef.src);
-
-        galleryItems.forEach((el, index) => {
-            if (el.preview === lightboxImageRef.src)
-            {
-                console.log(el.preview);
-                console.log(lightboxImageRef.src);
-                console.log(index);
+        galleryItems.forEach((el, index, arr) => {
+            if (el.original === lightboxImageRef.src) {
+                if (e.key === "ArrowLeft") {
+                //     let a;
+                //     let b;
+                //     if (index === 0) {
+                //         a = arr[arr.length - 1].original.toString();
+                //         b = arr[arr.length - 1].description.toString();
+                //     } else {
+                //         a = arr[index - 1].original.toString();
+                //         b = arr[index - 1].description.toString();
+                //     }
+                //     console.log(a, b);
+                //     return a, b;
+                     index === 0
+                        ? instalBgImgOnFullSkrin(arr[arr.length-1].original, arr[arr.length - 1].description)
+                        : instalBgImgOnFullSkrin(arr[index - 1].original, arr[index - 1].description);
+                }
+                if (e.key === "ArrowRight") {
+                    if (index > arr.length-2) {
+                        return;
+                    }
+                    index === arr[arr.length-1]
+                        ? instalBgImgOnFullSkrin(arr[0].original, arr[0].description)
+                        : instalBgImgOnFullSkrin(arr[index + 1].original, arr[index + 1].description);
+                }
             }
-            
         })
-        // instalBgImgOnFullSkrin('https://cdn.pixabay.com/photo/2019/05/14/16/43/himilayan-blue-poppy-4202825_1280.jpg', 'Hokkaido Flower');
-     });
-    
-    //  window.addEventListener('keydown', (e) => {
-    //     if (e.key !== "ArrowRight") {
-    //         return;
-    //     }
-    //     modalRef.classList.remove('is-open')
-    //  }, {once: true});
-    window.addEventListener('keydown', (e)=>console.dir(e))
+    });
 }
-
-customsSlider()
