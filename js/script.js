@@ -6,6 +6,9 @@ const lightboxImageRef = document.querySelector('.lightbox__image');
 const closeBtnRef = document.querySelector('.lightbox__button');
 const overlayRef = document.querySelector('div.lightbox__overlay');
 
+//индекс большой картинки
+let indexBigImg;
+
 //ссылка на массив оригинальных изображений
 const arrayOriginalImg = galleryItems.map((elements) => elements.original);
 
@@ -14,8 +17,6 @@ addMarkupToGallery();
 
 //вызов кастомый слайдер
 customsSlider();
-
-// instalBgImgOnFullSkrin(customsSlider())
 
 //вешаю слушатель событий на галерею
 galleryRef.addEventListener('click', onImgClick);
@@ -90,38 +91,31 @@ function closeModal() {
 function instalBgImgOnFullSkrin(url, alt) {
     lightboxImageRef.src = url;
     lightboxImageRef.alt = alt;
+    indexBigImg = arrayOriginalImg.indexOf(url);
+    console.log(indexBigImg);
 }
+
+//изменяем индекс большой картинки на -1
+function flipLeft() {
+    indexBigImg===0 ? indexBigImg=8 : indexBigImg-=1;
+}
+
+// изменяем индекс большой картинки на +1
+function flipRight () {
+    indexBigImg===8 ? indexBigImg=0 : indexBigImg+=1;
+}
+
 
 //функция листать изображения стрелками - я не знаю как сделать чтобы стрелка в право листала по одно картинке а не до конца массива, если бы forEach поддерживал break я думаю это бы помогло, но он не поддреживате =(
 function customsSlider() {
     window.addEventListener('keydown', (e) => {
-        galleryItems.forEach((el, index, arr) => {
-            if (el.original === lightboxImageRef.src) {
-                if (e.key === "ArrowLeft") {
-                //     let a;
-                //     let b;
-                //     if (index === 0) {
-                //         a = arr[arr.length - 1].original.toString();
-                //         b = arr[arr.length - 1].description.toString();
-                //     } else {
-                //         a = arr[index - 1].original.toString();
-                //         b = arr[index - 1].description.toString();
-                //     }
-                //     console.log(a, b);
-                //     return a, b;
-                     index === 0
-                        ? instalBgImgOnFullSkrin(arr[arr.length-1].original, arr[arr.length - 1].description)
-                        : instalBgImgOnFullSkrin(arr[index - 1].original, arr[index - 1].description);
-                }
-                if (e.key === "ArrowRight") {
-                    if (index > arr.length-2) {
-                        return;
-                    }
-                    index === arr[arr.length-1]
-                        ? instalBgImgOnFullSkrin(arr[0].original, arr[0].description)
-                        : instalBgImgOnFullSkrin(arr[index + 1].original, arr[index + 1].description);
-                }
+        if (e.key === "ArrowLeft") {
+            flipLeft();
+            instalBgImgOnFullSkrin(galleryItems[indexBigImg].original, galleryItems[indexBigImg].alt);
             }
-        })
+        if (e.key === "ArrowRight") {
+            flipRight ();
+            instalBgImgOnFullSkrin(galleryItems[indexBigImg].original, galleryItems[indexBigImg].alt);
+            }
     });
 }
